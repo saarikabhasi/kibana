@@ -42,8 +42,13 @@ import { useLoadInferenceModels } from '../../../../../services/api';
 interface Props {
   onChange(value: string): void;
   'data-test-subj'?: string;
+  setValue: (value: string) => void;
 }
-export const SelectInferenceId = ({ onChange, 'data-test-subj': dataTestSubj }: Props) => {
+export const SelectInferenceId = ({
+  onChange,
+  'data-test-subj': dataTestSubj,
+  setValue,
+}: Props) => {
   const {
     core: { application },
     docLinks,
@@ -141,7 +146,11 @@ export const SelectInferenceId = ({ onChange, 'data-test-subj': dataTestSubj }: 
 
     return subscription.unsubscribe;
   }, [subscribe, onChange]);
+
   const selectedOptions = options.filter((option) => option.checked).find((k) => k.label);
+  useEffect(() => {
+    setValue(selectedOptions?.label ?? 'elser_model_2');
+  }, [selectedOptions]);
   const [isInferencePopoverVisible, setIsInferencePopoverVisible] = useState<boolean>(false);
   const [inferenceEndpointError, setInferenceEndpointError] = useState<string | undefined>(
     undefined

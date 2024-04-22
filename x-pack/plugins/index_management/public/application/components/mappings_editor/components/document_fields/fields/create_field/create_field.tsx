@@ -15,6 +15,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiOutsideClickDetector,
+  EuiSelectableOption,
   EuiSpacer,
 } from '@elastic/eui';
 import { FieldWithSemanticTextInfo } from '../../../../types';
@@ -108,7 +109,7 @@ export const CreateField = React.memo(function CreateFieldComponent({
   const [nameValue, setNameValue] = useState<string>();
   const [inferenceIdComboValue, setInferenceIdComboValue] = useState<string>();
   const [semanticFieldType, setSemanticTextFieldType] = useState<string>();
-
+  const [inferenceValue, setValue] = useState<string>('elser_model_2');
   useFieldEffect(form, 'referenceField', setReferenceFieldComboValue);
   useFieldEffect(form, 'inferenceId', setInferenceIdComboValue);
   useFieldEffect(form, 'name', setNameValue);
@@ -133,7 +134,10 @@ export const CreateField = React.memo(function CreateFieldComponent({
     if (isValid) {
       form.reset();
       if (data.type === 'semantic_text') {
-        dispatch({ type: 'field.addSemanticText', value: data });
+        dispatch({
+          type: 'field.addSemanticText',
+          value: { ...data, inferenceId: inferenceValue },
+        });
       } else {
         dispatch({ type: 'field.add', value: data });
       }
@@ -292,7 +296,7 @@ export const CreateField = React.memo(function CreateFieldComponent({
               }}
             </FormDataProvider>
             {/* Field inference_id for semantic_text field type */}
-            <InferenceIdCombo />
+            <InferenceIdCombo setValue={setValue} />
 
             <EuiFlexGroup gutterSize="s" alignItems="center">
               <EuiFlexItem grow={true} />
@@ -320,8 +324,10 @@ function ReferenceFieldCombo({ indexName }: { indexName?: string }) {
     </EuiFlexItem>
   );
 }
-
-function InferenceIdCombo() {
+interface InferenceProps {
+  setValue: (value: string) => void;
+}
+function InferenceIdCombo({ setValue }: InferenceProps) {
   const [{ type }] = useFormData({ watch: 'type' });
 
   if (type === undefined || type[0]?.value !== 'semantic_text') {
@@ -332,7 +338,7 @@ function InferenceIdCombo() {
     <>
       <EuiSpacer />
       <UseField path="inferenceId">
-        {(field) => <SelectInferenceId onChange={field.setValue} />}
+        {(field) => <SelectInferenceId onChange={field.setValue} setValue={setValue} />}
       </UseField>
     </>
   );

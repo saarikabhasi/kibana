@@ -1,5 +1,5 @@
 import { i18n } from '@kbn/i18n';
-import type { AppMountParameters, CoreSetup, Plugin } from '@kbn/core/public';
+import type { AppMountParameters, CoreSetup, CoreStart, Plugin } from '@kbn/core/public';
 import type {
   SearchAssistantPluginSetup,
   SearchAssistantPluginStart,
@@ -11,17 +11,21 @@ import { SearchAssistant } from './embeddable';
 export class SearchAssistantPlugin
   implements Plugin<SearchAssistantPluginSetup, SearchAssistantPluginStart>
 {
-  public setup(core: CoreSetup<SearchAssistantPluginStartDependencies, SearchAssistantPluginStart>): SearchAssistantPluginSetup {
+  public setup(
+    core: CoreSetup<SearchAssistantPluginStartDependencies, SearchAssistantPluginStart>
+  ): SearchAssistantPluginSetup {
     core.application.register({
       id: PLUGIN_ID,
       appRoute: '/app/search_assistant',
-      title: i18n.translate('xpack.searchAssistant.applicationTitle', { defaultMessage: 'Search Assistant' }),
+      title: i18n.translate('xpack.searchAssistant.applicationTitle', {
+        defaultMessage: 'Search Assistant',
+      }),
       async mount({ element, history }: AppMountParameters) {
         const { renderApp } = await import('./application');
         const [coreStart, depsStart] = await core.getStartServices();
         const startDeps: SearchAssistantPluginStartDependencies = {
           ...depsStart,
-          history
+          history,
         };
         return renderApp(coreStart, startDeps, element);
       },
@@ -29,10 +33,13 @@ export class SearchAssistantPlugin
     return {};
   }
 
-  public start(): SearchAssistantPluginStart {
+  public start(
+    core: CoreStart,
+    services: SearchAssistantPluginStartDependencies
+  ): SearchAssistantPluginStart {
     return {
-      SearchAssistant
-    }
+      SearchAssistant,
+    };
   }
 
   public stop() {}

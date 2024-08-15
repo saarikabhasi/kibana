@@ -12,10 +12,13 @@
       "searchAssistant"
     ],
     "requiredPlugins": [
-      "navigation",
-      "observabilityAIAssistant"
+      "observabilityAIAssistant",
+      "observabilityAIAssistantApp"
     ],
-    "optionalPlugins": [],
+    "optionalPlugins": [
+      "cloud",
+      "usageCollection",
+    ],
     "requiredBundles": [
       "kibanaReact"
     ]

@@ -19,7 +19,7 @@ export const App: React.FC = () => {
       paddingSize="none"
       className="eui-fullHeight"
     >
-      <div> Search Assistant</div>
+      <div />
     </KibanaPageTemplate.Section>
   );
 };

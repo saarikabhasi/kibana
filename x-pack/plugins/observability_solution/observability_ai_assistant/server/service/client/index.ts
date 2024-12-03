@@ -7,7 +7,7 @@
 import type { SearchHit } from '@elastic/elasticsearch/lib/api/types';
 import { notFound } from '@hapi/boom';
 import type { ActionsClient } from '@kbn/actions-plugin/server';
-import type { ElasticsearchClient, IUiSettingsClient } from '@kbn/core/server';
+import type { CoreSetup, ElasticsearchClient, IUiSettingsClient } from '@kbn/core/server';
 import type { Logger } from '@kbn/logging';
 import type { PublicMethodsOf } from '@kbn/utility-types';
 import { SpanKind, context } from '@opentelemetry/api';
@@ -80,12 +80,20 @@ import {
   LangtraceServiceProvider,
   withLangtraceChatCompleteSpan,
 } from './operators/with_langtrace_chat_complete_span';
+import {
+  runSemanticTextKnowledgeBaseMigration,
+  scheduleSemanticTextMigration,
+} from '../task_manager_definitions/register_migrate_knowledge_base_entries_task';
+import { ObservabilityAIAssistantPluginStartDependencies } from '../../types';
+import { ObservabilityAIAssistantConfig } from '../../config';
 
 const MAX_FUNCTION_CALLS = 8;
 
 export class ObservabilityAIAssistantClient {
   constructor(
     private readonly dependencies: {
+      config: ObservabilityAIAssistantConfig;
+      core: CoreSetup<ObservabilityAIAssistantPluginStartDependencies>;
       actionsClient: PublicMethodsOf<ActionsClient>;
       uiSettingsClient: IUiSettingsClient;
       namespace: string;
@@ -721,11 +729,39 @@ export class ObservabilityAIAssistantClient {
   };
 
   getKnowledgeBaseStatus = () => {
-    return this.dependencies.knowledgeBaseService.status();
+    return this.dependencies.knowledgeBaseService.getStatus();
   };
 
-  setupKnowledgeBase = () => {
-    return this.dependencies.knowledgeBaseService.setup();
+  setupKnowledgeBase = async (modelId: string | undefined) => {
+    const { esClient, core, logger, knowledgeBaseService } = this.dependencies;
+
+    // setup the knowledge base
+    const res = await knowledgeBaseService.setup(esClient, modelId);
+
+    core
+      .getStartServices()
+      .then(([_, pluginsStart]) => {
+        logger.debug('Schedule semantic text migration task');
+        return scheduleSemanticTextMigration(pluginsStart);
+      })
+      .catch((error) => {
+        logger.error(`Failed to run semantic text migration task: ${error}`);
+      });
+
+    return res;
+  };
+
+  resetKnowledgeBase = () => {
+    const { esClient } = this.dependencies;
+    return this.dependencies.knowledgeBaseService.reset(esClient);
+  };
+
+  migrateKnowledgeBaseToSemanticText = () => {
+    return runSemanticTextKnowledgeBaseMigration({
+      esClient: this.dependencies.esClient,
+      logger: this.dependencies.logger,
+      config: this.dependencies.config,
+    });
   };
 
   addUserInstruction = async ({

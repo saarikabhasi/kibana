@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { useValues } from 'kea';
 
@@ -17,6 +17,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
+  EuiLink,
 } from '@elastic/eui';
 
 import { i18n } from '@kbn/i18n';
@@ -62,50 +63,27 @@ export const ConnectorsTable: React.FC<ConnectorsTableProps> = ({
     () => share?.url.locators.get('SEARCH_INDEX_DETAILS_LOCATOR_ID'),
     [share]
   );
-  const searchIndexDetailUrl = useCallback(
-    async (indexName: string) => {
+
+  const SearchIndicesLinkProps = useCallback(
+    (indexName: string) => {
       if (searchIndicesLocator) {
-        return await searchIndicesLocator.getUrl({ indexName });
+        return {
+          href: generateEncodedPath(searchIndicesLocator.getRedirectUrl({}), { indexName }),
+          onClick: async (event: React.MouseEvent<HTMLAnchorElement>) => {
+            event.preventDefault();
+            const url = await searchIndicesLocator.getUrl({ indexName });
+            navigateToUrl(url, {
+              shouldNotCreateHref: true,
+              shouldNotPrepend: true,
+            });
+          },
+        };
+      } else {
+        return null;
       }
-      return '';
     },
-    [searchIndicesLocator]
+    [navigateToUrl, searchIndicesLocator]
   );
-  const [url, setUrl] = useState<string>('');
-  const renderConnectorIndexName = (connector: ConnectorViewItem) => {
-    useEffect(() => {
-      const getSearchIndexDetailUrl = async (indexName: string) => {
-        if (searchIndicesLocator) {
-          const u = await searchIndicesLocator.getUrl({ indexName });
-          setUrl(u);
-        }
-        setUrl('');
-      };
-      getSearchIndexDetailUrl(connector?.index_name ?? '');
-    }, [searchIndicesLocator]);
-    return (
-      <>
-        {connector.index_name ? (
-          connector.indexExists ? (
-            <EuiLinkTo
-              to={
-                url
-                  ? url
-                  : generateEncodedPath(SEARCH_INDEX_PATH, { indexName: connector.index_name })
-              }
-            >
-              {connector.index_name}
-            </EuiLinkTo>
-          ) : (
-            connector.index_name
-          )
-        ) : (
-          '--'
-        )}
-        ;
-      </>
-    );
-  };
 
   const columns: Array<EuiBasicTableColumn<ConnectorViewItem>> = [
     ...(!isCrawler
@@ -135,7 +113,18 @@ export const ConnectorsTable: React.FC<ConnectorsTableProps> = ({
           defaultMessage: 'Index name',
         }
       ),
-      render: (connector: ConnectorViewItem) => renderConnectorIndexName(connector),
+      render: (connector: ConnectorViewItem) =>
+        connector.index_name ? (
+          connector.indexExists && searchIndicesLocator ? (
+            <EuiLink {...SearchIndicesLinkProps(connector.index_name)}>
+              {connector.index_name}
+            </EuiLink>
+          ) : (
+            connector.index_name
+          )
+        ) : (
+          '--'
+        ),
       width: isCrawler ? '70%' : '25%',
     },
     {

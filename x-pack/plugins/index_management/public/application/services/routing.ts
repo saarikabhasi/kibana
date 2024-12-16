@@ -100,6 +100,7 @@ export const navigateToIndexDetailsPage = async (
   const activeSolutionId = await firstValueFrom(
     chrome.getActiveSolutionNavId$()
   );
+  console.log("activeSolutionId",activeSolutionId)
   const searchIndicesLocator = share.url.locators.get('SEARCH_INDEX_DETAILS_LOCATOR_ID');
   if(searchIndicesLocator && activeSolutionId === 'es') {
     searchIndicesLocator.navigate({indexName, 'detailsTabId': tabId})

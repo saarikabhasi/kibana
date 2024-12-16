@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useValues } from 'kea';
 
@@ -57,7 +57,56 @@ export const ConnectorsTable: React.FC<ConnectorsTableProps> = ({
   isLoading,
   onDelete,
 }) => {
-  const { navigateToUrl } = useValues(KibanaLogic);
+  const { navigateToUrl, share } = useValues(KibanaLogic);
+  const searchIndicesLocator = useMemo(
+    () => share?.url.locators.get('SEARCH_INDEX_DETAILS_LOCATOR_ID'),
+    [share]
+  );
+  const searchIndexDetailUrl = useCallback(
+    async (indexName: string) => {
+      if (searchIndicesLocator) {
+        return await searchIndicesLocator.getUrl({ indexName });
+      }
+      return '';
+    },
+    [searchIndicesLocator]
+  );
+  const [url, setUrl] = useState<string>('');
+  const renderConnectorIndexName = (connector: ConnectorViewItem) => {
+    useEffect(() => {
+      const getSearchIndexDetailUrl = async (indexName: string) => {
+        if (searchIndicesLocator) {
+          const u = await searchIndicesLocator.getUrl({ indexName });
+          setUrl(u);
+        }
+        setUrl('');
+      };
+      getSearchIndexDetailUrl(connector?.index_name ?? '');
+    }, [searchIndicesLocator]);
+    return (
+      <>
+        {connector.index_name ? (
+          connector.indexExists ? (
+            <EuiLinkTo
+              to={
+                url
+                  ? url
+                  : generateEncodedPath(SEARCH_INDEX_PATH, { indexName: connector.index_name })
+              }
+            >
+              {connector.index_name}
+            </EuiLinkTo>
+          ) : (
+            connector.index_name
+          )
+        ) : (
+          '--'
+        )}
+        ;
+      </>
+    );
+  };
+
   const columns: Array<EuiBasicTableColumn<ConnectorViewItem>> = [
     ...(!isCrawler
       ? [
@@ -86,20 +135,7 @@ export const ConnectorsTable: React.FC<ConnectorsTableProps> = ({
           defaultMessage: 'Index name',
         }
       ),
-      render: (connector: ConnectorViewItem) =>
-        connector.index_name ? (
-          connector.indexExists ? (
-            <EuiLinkTo
-              to={generateEncodedPath(SEARCH_INDEX_PATH, { indexName: connector.index_name })}
-            >
-              {connector.index_name}
-            </EuiLinkTo>
-          ) : (
-            connector.index_name
-          )
-        ) : (
-          '--'
-        ),
+      render: (connector: ConnectorViewItem) => renderConnectorIndexName(connector),
       width: isCrawler ? '70%' : '25%',
     },
     {

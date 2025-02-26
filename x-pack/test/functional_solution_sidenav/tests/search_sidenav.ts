@@ -33,7 +33,7 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
     });
 
     describe('sidenav & breadcrumbs', () => {
-      it.only('renders the correct nav and navigate to links', async () => {
+      it('renders the correct nav and navigate to links', async () => {
         const expectNoPageReload = await solutionNavigation.createNoPageReloadCheck();
 
         await solutionNavigation.expectExists();
@@ -48,36 +48,36 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
           deepLinkId: 'enterpriseSearch',
         });
 
-        // // check the Content > Indices section
-        // await solutionNavigation.sidenav.clickLink({
-        //   deepLinkId: 'elasticsearchIndexManagement',
-        // });
-        // await solutionNavigation.sidenav.expectLinkActive({
-        //   deepLinkId: 'elasticsearchIndexManagement',
-        // });
-        // await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Deployment' });
-        // await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Content' });
-        // await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Index Management' });
-        // await solutionNavigation.breadcrumbs.expectBreadcrumbExists({
-        //   text: 'Indices',
-        // });
+        // check the Content > Indices section
+        await solutionNavigation.sidenav.clickLink({
+          deepLinkId: 'elasticsearchIndexManagement',
+        });
+        await solutionNavigation.sidenav.expectLinkActive({
+          deepLinkId: 'elasticsearchIndexManagement',
+        });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Deployment' });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Content' });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Index Management' });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({
+          text: 'Indices',
+        });
 
         // navigate to a different section
         await solutionNavigation.sidenav.openSection('project_settings_project_nav');
         await solutionNavigation.sidenav.clickLink({ navId: 'stack_management' });
         await solutionNavigation.sidenav.expectLinkActive({ navId: 'stack_management' });
-        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Overview' });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({ text: 'Content' });
 
         // navigate back to the home page using header logo
-        // await solutionNavigation.clickLogo();
-        // await solutionNavigation.sidenav.expectLinkActive({
-        //   deepLinkId: 'enterpriseSearch',
-        // });
-        // await solutionNavigation.breadcrumbs.expectBreadcrumbExists({
-        //   deepLinkId: 'enterpriseSearch',
-        // });
+        await solutionNavigation.clickLogo();
+        await solutionNavigation.sidenav.expectLinkActive({
+          deepLinkId: 'enterpriseSearch',
+        });
+        await solutionNavigation.breadcrumbs.expectBreadcrumbExists({
+          deepLinkId: 'enterpriseSearch',
+        });
 
-        // await expectNoPageReload();
+        await expectNoPageReload();
       });
 
       it('renders a feedback callout', async () => {

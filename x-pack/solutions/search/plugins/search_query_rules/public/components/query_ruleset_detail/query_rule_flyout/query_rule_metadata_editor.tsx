@@ -45,7 +45,7 @@ export const QueryRuleMetadataEditor: React.FC<QueryRuleMetadataEditorProps> = (
   criteriaValue,
 }) => {
   const [metadataField, setMetadataField] = useState<string>(criteriaValue.metadata || '');
-  // console.log('criteria?.values', criteriaValue);
+
   return (
     <EuiPanel data-test-subj="searchQueryRulesQueryRuleMetadataEditor" hasBorder>
       <EuiFlexGroup direction="row">
@@ -117,6 +117,12 @@ export const QueryRuleMetadataEditor: React.FC<QueryRuleMetadataEditorProps> = (
                     'xpack.search.queryRulesetDetail.queryRuleFlyout.metadataEditorOperatorLabel',
                     {
                       defaultMessage: 'Match type',
+                    }
+                  )}
+                  aria-label={i18n.translate(
+                    'xpack.search.queryRulesetDetail.queryRuleFlyout.metadataEditorOperatorLabel',
+                    {
+                      defaultMessage: 'Select matching type',
                     }
                   )}
                 >

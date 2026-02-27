@@ -1974,6 +1974,8 @@
       "@kbn/search-indices/*": ["x-pack/solutions/search/plugins/search_indices/*"],
       "@kbn/search-inference-endpoints": ["x-pack/solutions/search/plugins/search_inference_endpoints"],
       "@kbn/search-inference-endpoints/*": ["x-pack/solutions/search/plugins/search_inference_endpoints/*"],
+      "@kbn/search-inference-model-settings": ["x-pack/platform/plugins/shared/search_inference_model_settings"],
+      "@kbn/search-inference-model-settings/*": ["x-pack/platform/plugins/shared/search_inference_model_settings/*"],
       "@kbn/search-navigation": ["x-pack/solutions/search/plugins/search_navigation"],
       "@kbn/search-navigation/*": ["x-pack/solutions/search/plugins/search_navigation/*"],
       "@kbn/search-notebooks": ["x-pack/solutions/search/plugins/search_notebooks"],

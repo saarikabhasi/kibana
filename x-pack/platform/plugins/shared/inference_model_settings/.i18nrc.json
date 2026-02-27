@@ -1,0 +1,9 @@
+{
+  "prefix": "inferenceModelSettings",
+  "paths": {
+    "inferenceModelSettings": "."
+  },
+  "translations": [
+    "translations/ja-JP.json"
+  ]
+}

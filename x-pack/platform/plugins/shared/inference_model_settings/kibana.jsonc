@@ -1,0 +1,25 @@
+{
+  "type": "plugin",
+  "id": "@kbn/search-inference-model-settings",
+  "owner": "@elastic/search-kibana",
+  "group": "search",
+  "visibility": "private",
+  "plugin": {
+    "id": "inferenceModelSettings",
+    "server": true,
+    "browser": true,
+    "configPath": [
+      "xpack",
+      "inferenceModelSettings"
+    ],
+    "requiredPlugins": [
+      "features",
+      "management",
+      "ml",
+    ],
+    "optionalPlugins": [],
+    "requiredBundles": [
+      "kibanaReact",
+    ]
+  }
+}

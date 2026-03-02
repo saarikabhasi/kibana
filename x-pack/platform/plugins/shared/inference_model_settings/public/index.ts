@@ -4,9 +4,10 @@
  * 2.0; you may not use this file except in compliance with the Elastic License
  * 2.0.
  */
+import type { PluginInitializerContext } from '@kbn/core/public';
 import { InferenceModelSettingsPlugin } from './plugin';
 
-export function plugin() {
-  return new InferenceModelSettingsPlugin();
+export function plugin(initializerContext: PluginInitializerContext) {
+  return new InferenceModelSettingsPlugin(initializerContext);
 }
 export type { InferenceModelSettingsPluginSetup, InferenceModelSettingsPluginStart } from './types';

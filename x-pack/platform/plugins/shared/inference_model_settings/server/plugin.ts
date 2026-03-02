@@ -19,20 +19,18 @@ export class InferenceModelSettingsPlugin
   implements Plugin<InferenceModelSettingsPluginSetup, InferenceModelSettingsPluginStart>
 {
   private readonly logger: Logger;
-
   constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
   }
 
   public setup(core: CoreSetup, plugins: SearchInferenceModelSettingsPluginStartDependencies) {
     this.logger.debug('InferenceModelSettingsPlugin: Setup');
-
     plugins.features.registerKibanaFeature({
       id: PLUGIN_ID,
       minimumLicense: 'enterprise',
       name: PLUGIN_NAME,
       order: 2,
-      category: DEFAULT_APP_CATEGORIES.enterpriseSearch,
+      category: DEFAULT_APP_CATEGORIES.management,
       app: ['kibana', PLUGIN_ID],
       catalogue: [PLUGIN_ID],
       management: {
